@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 This module contains an asynchronous generator function
 that yields random floating-point numbers between 0 and 10.
@@ -7,9 +6,9 @@ that yields random floating-point numbers between 0 and 10.
 
 import asyncio
 import random
+from typing import AsyncGenerator
 
-
-async def async_generator():
+async def async_generator() -> AsyncGenerator[float, None]:
     """
     An asynchronous generator that yields random numbers between 0 and 10.
     It sleeps for 1 second before yielding each number.
