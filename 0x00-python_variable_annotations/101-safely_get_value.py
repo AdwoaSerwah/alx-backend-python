@@ -10,10 +10,10 @@ T = TypeVar('T')
 
 
 def safely_get_value(
-    dct: Mapping[Any, T],
+    dct: Mapping,
     key: Any,
     default: Union[T, None] = None
-) -> Union[T, None]:
+) -> Union[Any, T]:
     """
     Function to safely retrieve a value from a dictionary using a key.
     If the key exists, return the value; otherwise, return the default value.
