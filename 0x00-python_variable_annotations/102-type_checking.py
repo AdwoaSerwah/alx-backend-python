@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+"""
+Zooms into the input tuple by a given factor, returning a list
+of repeated elements.
+"""
 from typing import Tuple, List
 
 
