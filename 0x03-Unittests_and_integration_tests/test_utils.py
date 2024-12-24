@@ -5,7 +5,8 @@ access_nested_map function.
 """
 import unittest
 from parameterized import parameterized
-from utils import access_nested_map  # Ensure this import is correct
+from unittest.mock import patch, MagicMock
+from utils import access_nested_map, get_json  # Ensure this import is correct
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -36,7 +37,37 @@ class TestAccessNestedMap(unittest.TestCase):
             access_nested_map(nested_map, path)
 
         # Compare the exception message with the expected key directly
+        # Ensure key error message matches
         self.assertEqual(cm.exception.args[0], path[-1])
+
+
+class TestGetJson(unittest.TestCase):
+    """
+    Test case for the get_json function.
+    """
+
+    @parameterized.expand([
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False}),
+    ])
+    @patch('utils.requests.get')  # Mock requests.get in the utils module
+    def test_get_json(self, test_url, test_payload, mock_get):
+        """
+        Test that get_json returns the expected result.
+        """
+        # Set up the mock response
+        mock_response = MagicMock()
+        mock_response.json.return_value = test_payload
+        mock_get.return_value = mock_response
+
+        # Call the function to test
+        result = get_json(test_url)
+
+        # Assert the mock get was called once with the correct URL
+        mock_get.assert_called_once_with(test_url)
+
+        # Assert the result is the expected payload
+        self.assertEqual(result, test_payload)
 
 
 if __name__ == "__main__":
