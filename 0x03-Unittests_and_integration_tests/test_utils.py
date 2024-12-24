@@ -6,7 +6,7 @@ access_nested_map function.
 import unittest
 from parameterized import parameterized
 from unittest.mock import patch, MagicMock
-from utils import access_nested_map, get_json  # Ensure this import is correct
+from utils import access_nested_map, get_json, memoize
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -15,9 +15,9 @@ class TestAccessNestedMap(unittest.TestCase):
     """
 
     @parameterized.expand([
-        ({"a": 1}, ("a",), 1),  # Test simple key-value access
-        ({"a": {"b": 2}}, ("a",), {"b": 2}),  # Test nested dictionary
-        ({"a": {"b": 2}}, ("a", "b"), 2),  # Test deep nested dictionary
+        ({"a": 1}, ("a",), 1),
+        ({"a": {"b": 2}}, ("a",), {"b": 2}),
+        ({"a": {"b": 2}}, ("a", "b"), 2),
     ])
     def test_access_nested_map(self, nested_map, path, expected_result):
         """
@@ -36,8 +36,6 @@ class TestAccessNestedMap(unittest.TestCase):
         with self.assertRaises(KeyError) as cm:
             access_nested_map(nested_map, path)
 
-        # Compare the exception message with the expected key directly
-        # Ensure key error message matches
         self.assertEqual(cm.exception.args[0], path[-1])
 
 
@@ -68,6 +66,41 @@ class TestGetJson(unittest.TestCase):
 
         # Assert the result is the expected payload
         self.assertEqual(result, test_payload)
+
+
+class TestMemoize(unittest.TestCase):
+    """
+    Test case for the memoize function.
+    """
+
+    def test_memoize(self):
+        """
+        Test that memoization works: a_method is only called once,
+        even when a_property is called multiple times.
+        """
+        # Define the TestClass with memoize decorator
+        class TestClass:
+            def a_method(self):
+                return 42
+
+            @memoize
+            def a_property(self):
+                return self.a_method()
+
+        # Create an instance of TestClass
+        test_class = TestClass()
+
+        # Patch the a_method function inside TestClass
+        with patch.object(TestClass, 'a_method', return_value=42) as mock_a_method:
+            # Call a_property twice
+            first_result = test_class.a_property
+            second_result = test_class.a_property
+
+            # Verify a_method was called only once
+            mock_a_method.assert_called_once()
+
+            # Check that both calls to a_property return the same result
+            self.assertEqual(first_result, second_result)
 
 
 if __name__ == "__main__":
